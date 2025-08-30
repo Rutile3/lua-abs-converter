@@ -25,7 +25,8 @@
                 </div>
             </div>
             <div class="card-body">
-                <textarea id="input" class="form-control code-area" rows="7" placeholder="ここにコードを貼り付け…"></textarea>
+                <textarea id="input" class="form-control code-area" rows="7" placeholder="ここにコードを貼り付け…"
+                    spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
             </div>
         </div>
 
@@ -35,7 +36,7 @@
                 <span>変換設定</span>
                 <div class="d-flex gap-2">
                     <button id="btn-transform" class="btn btn-primary btn-sm">変換する</button>
-                    <button id="btn-reset" class="btn btn-outline-secondary btn-sm">リセット</button>
+                    <button id="btn-reset" class="btn btn-outline-danger btn-sm">リセット</button>
                 </div>
             </div>
             <div class="card-body">
@@ -69,7 +70,7 @@
                     </div>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="le-mode" id="le-range" value="range">
-                        <label class="form-check-label" for="le-range">-n <= x and x <= n</label>
+                        <label class="form-check-label" for="le-range">-n <= x and x <=n</label>
                     </div>
                 </div>
                 <div class="form-text mt-2">
@@ -83,11 +84,12 @@
             <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
                 <span>ソースコード（出力）</span>
                 <div class="d-flex gap-2">
-                    <button id="btn-copy" class="btn btn-outline-secondary btn-sm">コピー</button>
+                    <button id="btn-copy" class="btn btn-primary btn-sm">コピー</button>
                 </div>
             </div>
             <div class="card-body">
-                <textarea id="output" class="form-control code-area" rows="7" readonly placeholder="変換結果がここに表示されます"></textarea>
+                <textarea id="output" class="form-control code-area" rows="7" readonly
+                    placeholder="変換結果がここに表示されます"></textarea>
             </div>
         </div>
     </div>
