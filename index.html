@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light">
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <title>Lua abs変換器</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="bg-light">
+    <div class="container py-4">
+        <h1 class="mb-4">Lua abs変換器</h1>
+
+        <!-- 入力セクション -->
+        <div class="card mb-3">
+            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                <span>ソースコード（入力）</span>
+                <div class="d-flex gap-2">
+                    <button id="btn-sample" class="btn btn-outline-primary btn-sm">サンプルを入れる</button>
+                    <button id="btn-clear-input" class="btn btn-outline-danger btn-sm">入力クリア</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <textarea id="input" class="form-control code-area" rows="7" placeholder="ここにコードを貼り付け…"></textarea>
+            </div>
+        </div>
+
+        <!-- 設定セクション -->
+        <div class="card mb-3">
+            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                <span>変換設定</span>
+                <div class="d-flex gap-2">
+                    <button id="btn-transform" class="btn btn-primary btn-sm">変換する</button>
+                    <button id="btn-reset" class="btn btn-outline-secondary btn-sm">リセット</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- == の変換ルール -->
+                <h3 class="h6 fw-semibold mb-2">== の変換ルール</h3>
+                <div class="mb-3">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="eq-mode" id="eq-abs" value="abs" checked>
+                        <label class="form-check-label" for="eq-abs">abs(x) == n</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="eq-mode" id="eq-square" value="square">
+                        <label class="form-check-label" for="eq-square">x^2 == n^2</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="eq-mode" id="eq-split" value="split">
+                        <label class="form-check-label" for="eq-split">x == -n or x == n</label>
+                    </div>
+                </div>
+
+                <!-- <= の変換ルール -->
+                <h3 class="h6 fw-semibold mb-2">&lt;= の変換ルール</h3>
+                <div class="mb-3">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="le-mode" id="le-abs" value="abs" checked>
+                        <label class="form-check-label" for="le-abs">abs(x) <= n</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="le-mode" id="le-square" value="square">
+                        <label class="form-check-label" for="le-square">x^2 <= n^2</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="le-mode" id="le-range" value="range">
+                        <label class="form-check-label" for="le-range">-n <= x and x <= n</label>
+                    </div>
+                </div>
+                <div class="form-text mt-2">
+                    対象は <code>abs(任意の変数)</code>。n は数値／識別子／簡単な式に対応。
+                </div>
+            </div>
+        </div>
+
+        <!-- 出力セクション -->
+        <div class="card mb-3">
+            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                <span>ソースコード（出力）</span>
+                <div class="d-flex gap-2">
+                    <button id="btn-copy" class="btn btn-outline-secondary btn-sm">コピー</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <textarea id="output" class="form-control code-area" rows="7" readonly placeholder="変換結果がここに表示されます"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

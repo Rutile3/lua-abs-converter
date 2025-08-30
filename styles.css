@@ -1,0 +1,17 @@
+:root {
+    --code-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+.code-area {
+    min-height: 7em;
+    font-family: var(--code-font);
+    font-size: 0.95rem;
+    line-height: 1.4;
+    white-space: pre;
+}
+
+@media (min-width: 992px) {
+    .code-area {
+        min-height: 360px;
+    }
+}
