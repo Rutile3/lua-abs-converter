@@ -8,6 +8,7 @@
     font-size: 0.95rem;
     line-height: 1.4;
     white-space: pre;
+    resize: vertical; /* 横は固定 */
 }
 
 @media (min-width: 992px) {
