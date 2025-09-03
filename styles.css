@@ -1,4 +1,5 @@
 :root {
+    --bs-border-color: var(--bs-gray-600);
     --code-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 }
 
