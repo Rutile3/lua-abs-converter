@@ -59,7 +59,7 @@
             const n = nRaw.trim();
             if (eqMode === 'abs') return `abs(${v}) == ${n}`;
             if (eqMode === 'square') return `${v}^2 == ${squaredValue(n)}`;       // 右辺は数値なら二乗済みに
-            if (eqMode === 'split') return `${v} == -${wrap(n)} or ${v} == ${wrap(n)}`;
+            if (eqMode === 'split')  return `(${v} == -${wrap(n)} or ${v} == ${wrap(n)})`;
             return _;
         });
 
@@ -68,7 +68,7 @@
             const n = nRaw.trim();
             if (leMode === 'abs') return `abs(${v}) <= ${n}`;
             if (leMode === 'square') return `${v}^2 <= ${squaredValue(n)}`;       // 右辺は数値なら二乗済みに
-            if (leMode === 'range') return `-${wrap(n)} <= ${v} and ${v} <= ${wrap(n)}`;
+            if (leMode === 'range')  return `(-${wrap(n)} <= ${v} and ${v} <= ${wrap(n)})`;
             return _;
         });
 
@@ -108,8 +108,8 @@
     btnSample?.addEventListener('click', () => {
         if (!elInput) return;
         elInput.value = [
-            'if abs(x) <= 3 then',
-            '  if abs(x) == 4 then return true end',
+            'if abs(x) <= 3 and y == 1 then',
+            '  if abs(x) == 4 and z == 1 then return true end',
             'end',
             'y = abs(x) == N',
             'z = abs(a) <= (A+B)',
