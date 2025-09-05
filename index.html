@@ -45,38 +45,38 @@
             </div>
             <div class="card-body">
                 <!-- == の変換ルール -->
-                <h3 class="h6 fw-semibold mb-2">== の変換ルール</h3>
-                <div class="mb-3">
+                <fieldset class="mb-3">
+                    <legend class="h6 fw-semibold mb-2">== の変換ルール</legend>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="eq-mode" id="eq-abs" value="abs" checked>
-                        <label class="form-check-label" for="eq-abs">abs(x) == n</label>
+                        <label class="form-check-label" for="eq-abs"><code>abs(x) == n</code></label>
                     </div>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="eq-mode" id="eq-square" value="square">
-                        <label class="form-check-label" for="eq-square">x^2 == n^2</label>
+                        <label class="form-check-label" for="eq-square"><code>x^2 == n^2</code></label>
                     </div>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="eq-mode" id="eq-split" value="split">
-                        <label class="form-check-label" for="eq-split">(x == -n or x == n)</label>
+                        <label class="form-check-label" for="eq-split"><code>(x == -n or x == n)</code></label>
                     </div>
-                </div>
+                </fieldset>
 
                 <!-- <= の変換ルール -->
-                <h3 class="h6 fw-semibold mb-2">&lt;= の変換ルール</h3>
-                <div class="mb-3">
+                <fieldset class="mb-3">
+                    <legend class="h6 fw-semibold mb-2">&lt;= の変換ルール</legend>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="le-mode" id="le-abs" value="abs" checked>
-                        <label class="form-check-label" for="le-abs">abs(x) <= n</label>
+                        <label class="form-check-label" for="le-abs"><code>abs(x) <= n</code></label>
                     </div>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="le-mode" id="le-square" value="square">
-                        <label class="form-check-label" for="le-square">x^2 <= n^2</label>
+                        <label class="form-check-label" for="le-square"><code>x^2 <= n^2</code></label>
                     </div>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="le-mode" id="le-range" value="range">
-                        <label class="form-check-label" for="le-range">(-n <= x and x <= n)</label>
+                        <label class="form-check-label" for="le-range"><code>(-n <= x and x <= n)</code></label>
                     </div>
-                </div>
+                </fieldset>
                 <div class="form-text mt-2">
                     対象は <code>abs(任意の変数)</code>。n は数値／識別子／簡単な式に対応。
                 </div>
