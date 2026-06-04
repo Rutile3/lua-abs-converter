@@ -18,4 +18,9 @@
             'w = abs(foo) == 3.5',
         ].join('\n');
     });
+
+    clearSourceButton.addEventListener('click', () => {
+        sourceCode.value = '';
+        convertedCode.value = '';
+    });
 })();
