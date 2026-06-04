@@ -51,31 +51,31 @@
         converted = converted.replace(eqPattern, (matched, variable, rawValue) => {
             const value = rawValue.trim();
 
-            if (eqRule === 'abs') {
-                return `abs(${variable}) == ${value}`;
+            switch (eqRule) {
+                case 'abs':
+                    return `abs(${variable}) == ${value}`;
+                case 'square':
+                    return `${variable}^2 == ${squareValue(value)}`;
+                case 'split':
+                    return `(${variable} == -${wrapExpression(value)} or ${variable} == ${wrapExpression(value)})`;
+                default:
+                    return matched;
             }
-            if (eqRule === 'square') {
-                return `${variable}^2 == ${squareValue(value)}`;
-            }
-            if (eqRule === 'split') {
-                return `(${variable} == -${wrapExpression(value)} or ${variable} == ${wrapExpression(value)})`;
-            }
-            return matched;
         });
 
         converted = converted.replace(lePattern, (matched, variable, rawValue) => {
             const value = rawValue.trim();
 
-            if (leRule === 'abs') {
-                return `abs(${variable}) <= ${value}`;
+            switch (leRule) {
+                case 'abs':
+                    return `abs(${variable}) <= ${value}`;
+                case 'square':
+                    return `${variable}^2 <= ${squareValue(value)}`;
+                case 'range':
+                    return `(-${wrapExpression(value)} <= ${variable} and ${variable} <= ${wrapExpression(value)})`;
+                default:
+                    return matched;
             }
-            if (leRule === 'square') {
-                return `${variable}^2 <= ${squareValue(value)}`;
-            }
-            if (leRule === 'range') {
-                return `(-${wrapExpression(value)} <= ${variable} and ${variable} <= ${wrapExpression(value)})`;
-            }
-            return matched;
         });
 
         return converted;
