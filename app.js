@@ -1,159 +1,137 @@
 'use strict';
 
-// すべて IIFE 内に閉じてグローバル漏れを防止
 (() => {
-    const $ = (sel) => document.querySelector(sel);
+    const sourceCode = document.getElementById('source-code');
+    const convertedCode = document.getElementById('converted-code');
 
-    // --- Elements ---
-    const elInput = $('#input');
-    const elOutput = $('#output');
+    const loadSampleButton = document.getElementById('load-sample-button');
+    const clearSourceButton = document.getElementById('clear-source-button');
+    const copyConvertedButton = document.getElementById('copy-converted-button');
 
-    // Buttons（存在しないIDは無視）
-    const btnTransform = $('#btn-transform');
-    const btnSample = $('#btn-sample');
-    const btnCopy = $('#btn-copy');
-    const btnClearInput = $('#btn-clear-input');
-    const btnReset = $('#btn-reset');
+    const getSelectedEqRule = () => document.querySelector('input[name="eq-rule"]:checked')?.value ?? 'abs';
+    const getSelectedLeRule = () => document.querySelector('input[name="le-rule"]:checked')?.value ?? 'abs';
 
-    // --- Helpers ---
-    const getEqMode = () => (document.querySelector('input[name="eq-mode"]:checked')?.value ?? 'abs');
-    const getLeMode = () => (document.querySelector('input[name="le-mode"]:checked')?.value ?? 'abs');
+    const copyButtonText = copyConvertedButton.textContent;
+    let copyMessageTimeoutId = null;
 
-    const isNumber = (s) => /^-?\d+(?:\.\d+)?$/.test(String(s).trim());
-    const wrap = (s) => {
-        const t = String(s).trim();
-        const ident = /^[A-Za-z_]\w*$/;
-        return (ident.test(t) || isNumber(t)) ? t : `(${t})`;
+    const isNumber = (value) => /^-?\d+(?:\.\d+)?$/.test(String(value).trim());
+
+    const wrapExpression = (value) => {
+        const expression = String(value).trim();
+        const isIdentifier = /^[A-Za-z_]\w*$/.test(expression);
+        const isParenthesized = /^\([^()\n]*\)$/.test(expression);
+
+        return isIdentifier || isNumber(expression) || isParenthesized ? expression : `(${expression})`;
     };
 
-    // 数値なら二乗した実数を返す。数値以外は (expr)^2 を生成
-    function squaredValue(exprRaw) {
-        const t = exprRaw.trim();
-        if (isNumber(t)) {
-            const n = parseFloat(t);
-            const v = n * n;
-            return Number.isInteger(v) ? String(v) : String(+v.toFixed(12)).replace(/\.?0+$/, '');
+    const squareValue = (value) => {
+        const expression = value.trim();
+
+        if (!isNumber(expression)) {
+            return `${wrapExpression(expression)}^2`;
         }
-        return `${wrap(t)}^2`;
-    }
 
-    // --- Core transform ---
-    function transform(text, { eqMode, leMode }) {
-        let out = text;
-
-        // パターン部品（非捕獲）
-        const IDENT_MAIN = '[A-Za-z_]\\w*';                     // v 用
-        const NUMBER = '(?:-?\\d+(?:\\.\\d+)?)';            // 数値
-        const IDENT_RHS = '(?:[A-Za-z_]\\w*)';                 // 識別子
-        const PAREN_EXPR = '(?:\\([^()\\n]*\\))';               // 改行なしの簡単な括弧式（入れ子は対象外）
-
-        // 右辺は「数値 or 識別子 or 括弧式」を一つだけ許容（←ここを 1 キャプチャにまとめる）
-        const RHS = `(${NUMBER}|${IDENT_RHS}|${PAREN_EXPR})`;
-
-        // 語境界つき abs
-        const reEq = new RegExp(`\\babs\\(\\s*(${IDENT_MAIN})\\s*\\)\\s*==\\s*${RHS}`, 'g');
-        const reLe = new RegExp(`\\babs\\(\\s*(${IDENT_MAIN})\\s*\\)\\s*<=\\s*${RHS}`, 'g');
-
-        // abs(v) == n
-        out = out.replace(reEq, (_, v, nRaw) => {
-            const n = nRaw.trim();
-            if (eqMode === 'abs') return `abs(${v}) == ${n}`;
-            if (eqMode === 'square') return `${v}^2 == ${squaredValue(n)}`;       // 右辺は数値なら二乗済みに
-            if (eqMode === 'split')  return `(${v} == -${wrap(n)} or ${v} == ${wrap(n)})`;
-            return _;
-        });
-
-        // abs(v) <= n
-        out = out.replace(reLe, (_, v, nRaw) => {
-            const n = nRaw.trim();
-            if (leMode === 'abs') return `abs(${v}) <= ${n}`;
-            if (leMode === 'square') return `${v}^2 <= ${squaredValue(n)}`;       // 右辺は数値なら二乗済みに
-            if (leMode === 'range')  return `(-${wrap(n)} <= ${v} and ${v} <= ${wrap(n)})`;
-            return _;
-        });
-
-        return out;
-    }
-
-    function runTransform() {
-        if (!elInput || !elOutput) return;
-        const res = transform(elInput.value, {
-            eqMode: getEqMode(),
-            leMode: getLeMode(),
-        });
-        elOutput.value = res;
-    }
-
-    // デバウンス（貼り付けや連打での無駄処理を抑制）
-    const debounce = (fn, ms = 120) => {
-        let t;
-        return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+        const squared = Number.parseFloat(expression) ** 2;
+        return Number.isInteger(squared)
+            ? String(squared)
+            : String(+squared.toFixed(12)).replace(/\.?0+$/, '');
     };
-    const runTransformDebounced = debounce(runTransform, 120);
 
-    // --- Events ---
+    const convertCode = (code, eqRule, leRule) => {
+        let converted = code;
 
-    // 入力が変わったら即反映（デバウンス）
-    elInput?.addEventListener('input', runTransformDebounced);
+        // パターン部品
+        const identifier = '[A-Za-z_]\\w*'; // 識別子
+        const number = '-?\\d+(?:\\.\\d+)?'; // 数値（負数、整数、小数を考慮）
+        const parenthesizedExpression = '\\([^()\\n]*\\)'; // 括弧で囲まれた式
 
-    // ラジオ変更で再変換（デバウンス）
-    document.querySelectorAll('input[name="eq-mode"], input[name="le-mode"]').forEach(el => {
-        el.addEventListener('change', runTransformDebounced);
+        // 左辺と右辺
+        const wordBoundary = '\\b';
+        const absVariable = `${wordBoundary}abs\\(\\s*(${identifier})\\s*\\)`;
+        const rightHandSide = `(${number}|${identifier}|${parenthesizedExpression})`;
+
+        // abs() を含む左辺と比較対象の右辺
+        const eqPattern = new RegExp(`${absVariable}\\s*==\\s*${rightHandSide}`, 'g');
+        const lePattern = new RegExp(`${absVariable}\\s*<=\\s*${rightHandSide}`, 'g');
+
+        converted = converted.replace(eqPattern, (matched, variable, rawValue) => {
+            const value = rawValue.trim();
+
+            switch (eqRule) {
+                case 'abs':
+                    return `abs(${variable}) == ${value}`;
+                case 'square':
+                    return `${variable}^2 == ${squareValue(value)}`;
+                case 'split':
+                    return `(${variable} == -${wrapExpression(value)} or ${variable} == ${wrapExpression(value)})`;
+                default:
+                    return matched;
+            }
+        });
+
+        converted = converted.replace(lePattern, (matched, variable, rawValue) => {
+            const value = rawValue.trim();
+
+            switch (leRule) {
+                case 'abs':
+                    return `abs(${variable}) <= ${value}`;
+                case 'square':
+                    return `${variable}^2 <= ${squareValue(value)}`;
+                case 'range':
+                    return `(-${wrapExpression(value)} <= ${variable} and ${variable} <= ${wrapExpression(value)})`;
+                default:
+                    return matched;
+            }
+        });
+
+        return converted;
+    };
+
+    const updateConvertedCode = () => {
+        const eqRule = getSelectedEqRule();
+        const leRule = getSelectedLeRule();
+
+        convertedCode.value = convertCode(sourceCode.value, eqRule, leRule);
+    };
+
+    sourceCode.addEventListener('input', updateConvertedCode);
+
+    document.querySelectorAll('input[name="eq-rule"], input[name="le-rule"]').forEach((rule) => {
+        rule.addEventListener('change', updateConvertedCode);
     });
 
-    // 変換する
-    btnTransform?.addEventListener('click', runTransform);
-
-    // サンプルを入れる（正しい改行）
-    btnSample?.addEventListener('click', () => {
-        if (!elInput) return;
-        elInput.value = [
+    loadSampleButton.addEventListener('click', () => {
+        sourceCode.value = [
             'if abs(x) <= 3 and y == 1 then',
             '  if abs(x) == 4 and z == 1 then return true end',
             'end',
             'y = abs(x) == N',
             'z = abs(a) <= (A+B)',
-            'w = abs(foo) == 3.5'
+            'w = abs(foo) == 3.5',
         ].join('\n');
-        runTransform();
+        updateConvertedCode();
     });
 
-    // 入力クリア（出力は触らない）
-    btnClearInput?.addEventListener('click', () => {
-        if (!elInput) return;
-        elInput.value = '';
-        runTransform();
+    clearSourceButton.addEventListener('click', () => {
+        sourceCode.value = '';
+        updateConvertedCode();
     });
 
-    // コピー
-    btnCopy?.addEventListener('click', async () => {
-        if (!elOutput) return;
+    copyConvertedButton.addEventListener('click', async () => {
+        if (!convertedCode.value) {
+            return;
+        }
+
         try {
-            await navigator.clipboard.writeText(elOutput.value);
-            const prev = btnCopy.textContent;
-            btnCopy.textContent = 'コピーしました';
-            setTimeout(() => (btnCopy.textContent = prev ?? 'コピー'), 1200);
+            await navigator.clipboard.writeText(convertedCode.value);
+
+            copyConvertedButton.textContent = 'コピーしました';
+            clearTimeout(copyMessageTimeoutId);
+            copyMessageTimeoutId = setTimeout(() => {
+                copyConvertedButton.textContent = copyButtonText;
+            }, 1500);
         } catch {
             alert('クリップボードへのコピーに失敗しました。');
         }
     });
-
-    // リセット：変換設定のみ初期値に戻す（入力・出力は維持）
-    btnReset?.addEventListener('click', () => {
-        document.querySelector('#eq-abs') && ((document.querySelector('#eq-abs')).checked = true);
-        document.querySelector('#le-abs') && ((document.querySelector('#le-abs')).checked = true);
-        runTransform(); // 現在の入力に対して既定設定で再計算
-    });
-
-    // 便利ショートカット
-    // Cmd/Ctrl + Enter => 変換、 Cmd/Ctrl + B => コピー
-    document.addEventListener('keydown', (e) => {
-        const isMod = e.metaKey || e.ctrlKey;
-        if (!isMod) return;
-        if (e.key === 'Enter') { e.preventDefault(); btnTransform?.click(); }
-        if (e.key.toLowerCase() === 'b') { e.preventDefault(); btnCopy?.click(); }
-    });
-
-    // 初期描画
-    runTransform();
 })();

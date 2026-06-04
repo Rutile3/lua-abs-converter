@@ -2,115 +2,125 @@
 <html lang="ja">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="color-scheme" content="light">
-    <meta name="description" content="Luaのabs(x)条件式を、二乗・正負分解・範囲指定など等価な形式に変換できるWebツール。">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
 
     <title>Lua abs変換器</title>
-    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.png" type="image/png" />
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-501GNTE7BK"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-    
-      gtag('config', 'G-501GNTE7BK');
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-501GNTE7BK');
     </script>
 </head>
 
-<body class="bg-light">
-    <header class="container my-4">
-        <h1>Lua abs変換器</h1>
+<body class="d-flex flex-column min-vh-100">
+    <header class="navbar navbar-dark bg-brand shadow-sm">
+        <div class="container-md d-flex align-items-center">
+            <a href="https://github.com/Rutile3/lua-abs-converter" class="navbar-brand fw-bold">Lua abs変換器</a>
+            <a href="https://link-hub.rutile3.com/" target="_blank" rel="noopener"
+                class="d-flex align-items-center text-decoration-none ms-auto">
+                <span class="text-white small ms-auto">by Rutile3</span>
+                <img src="avatar.png" alt="Avatar" class="avatar ms-2">
+            </a>
+        </div>
     </header>
 
-    <main class="container my-4">
-        <!-- 入力セクション -->
-        <section class="card mb-3" aria-labelledby="input-title">
-            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
-                <span id="input-title">ソースコード（入力）</span>
-                <div class="d-flex gap-2">
-                    <button id="btn-sample" class="btn btn-outline-primary btn-sm">サンプルを入れる</button>
-                    <button id="btn-clear-input" class="btn btn-outline-danger btn-sm">入力クリア</button>
+    <main class="flex-fill container-md my-4">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <span class="fw-semibold">ソースコード（入力）</span>
+                        <div class="d-flex gap-2">
+                            <button type="button" id="load-sample-button" class="btn btn-sm btn-outline-secondary">サンプル</button>
+                            <button type="button" id="clear-source-button" class="btn btn-sm btn-outline-danger">クリア</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <textarea id="source-code" class="form-control code-area" rows="8" placeholder="ここにコードを貼り付け…"
+                            spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+                    </div>
                 </div>
             </div>
-            <div class="card-body">
-                <textarea id="input" class="form-control code-area" rows="7" placeholder="ここにコードを貼り付け…"
-                    spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+            <div class="col-lg-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <span class="fw-semibold">ソースコード（出力）</span>
+                        <button type="button" id="copy-converted-button" class="btn btn-sm btn-primary">コピー</button>
+                    </div>
+                    <div class="card-body">
+                        <textarea id="converted-code" class="form-control code-area" rows="8" placeholder="変換結果がここに表示されます"
+                            spellcheck="false" autocapitalize="off" autocomplete="off" readonly></textarea>
+                    </div>
+                </div>
             </div>
-        </section>
+            <div class="col-lg-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light fw-semibold">変換設定</div>
+                    <div class="card-body">
+                        <!-- 「==」の変換ルール -->
+                        <fieldset class="mb-3">
+                            <legend class="h6 fw-semibold mb-2">== の変換ルール</legend>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="eq-rule" id="eq-abs" value="abs" checked>
+                                <label class="form-check-label" for="eq-abs">abs(x) == n</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="eq-rule" id="eq-square" value="square">
+                                <label class="form-check-label" for="eq-square">x^2 == n^2</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="eq-rule" id="eq-split" value="split">
+                                <label class="form-check-label" for="eq-split">(x == -n or x == n)</label>
+                            </div>
+                        </fieldset>
 
-        <!-- 設定セクション -->
-        <section class="card mb-3" aria-labelledby="setting-title">
-            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
-                <span id="setting-title">変換設定</span>
-                <div class="d-flex gap-2">
-                    <button id="btn-transform" class="btn btn-primary btn-sm">変換する</button>
-                    <button id="btn-reset" class="btn btn-outline-danger btn-sm">リセット</button>
+                        <!-- 「<=」の変換ルール -->
+                        <fieldset class="mb-3">
+                            <legend class="h6 fw-semibold mb-2">&lt;= の変換ルール</legend>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="le-rule" id="le-abs" value="abs" checked>
+                                <label class="form-check-label" for="le-abs">abs(x) &lt;= n</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="le-rule" id="le-square" value="square">
+                                <label class="form-check-label" for="le-square">x^2 &lt;= n^2</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="le-rule" id="le-range" value="range">
+                                <label class="form-check-label" for="le-range">(-n &lt;= x and x &lt;= n)</label>
+                            </div>
+                        </fieldset>
+                        <div class="form-text mt-2">
+                            変換対象は <code>abs(任意の変数)</code>。n は数値／識別子／簡単な式に対応。
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="card-body">
-                <!-- == の変換ルール -->
-                <fieldset class="mb-3">
-                    <legend class="h6 fw-semibold mb-2">== の変換ルール</legend>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="eq-mode" id="eq-abs" value="abs" checked>
-                        <label class="form-check-label" for="eq-abs">abs(x) == n</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="eq-mode" id="eq-square" value="square">
-                        <label class="form-check-label" for="eq-square">x^2 == n^2</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="eq-mode" id="eq-split" value="split">
-                        <label class="form-check-label" for="eq-split">(x == -n or x == n)</label>
-                    </div>
-                </fieldset>
-
-                <!-- <= の変換ルール -->
-                <fieldset class="mb-3">
-                    <legend class="h6 fw-semibold mb-2">&lt;= の変換ルール</legend>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="le-mode" id="le-abs" value="abs" checked>
-                        <label class="form-check-label" for="le-abs">abs(x) <= n</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="le-mode" id="le-square" value="square">
-                        <label class="form-check-label" for="le-square">x^2 <= n^2</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="le-mode" id="le-range" value="range">
-                        <label class="form-check-label" for="le-range">(-n <= x and x <= n)</label>
-                    </div>
-                </fieldset>
-                <div class="form-text mt-2">
-                    対象は <code>abs(任意の変数)</code>。n は数値／識別子／簡単な式に対応。
-                </div>
-            </div>
-        </section>
-
-        <!-- 出力セクション -->
-        <section class="card mb-3" aria-labelledby="output-title">
-            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
-                <span id="output-title">ソースコード（出力）</span>
-                <div class="d-flex gap-2">
-                    <button id="btn-copy" class="btn btn-primary btn-sm">コピー</button>
-                </div>
-            </div>
-            <div class="card-body">
-                <textarea id="output" class="form-control code-area" rows="7" readonly placeholder="変換結果がここに表示されます"
-                    spellcheck="false" autocapitalize="off"></textarea>
-            </div>
-        </section>
+        </div>
     </main>
 
-    <script src="app.js" defer></script>
+    <footer class="footer py-3 bg-brand text-white">
+        <div class="container-md small">
+            <span>© 2025 Rutile3 | MIT License</span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <script src="app.js"></script>
 </body>
 
 </html>
