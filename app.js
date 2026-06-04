@@ -8,11 +8,23 @@
     const clearSourceButton = document.getElementById('clear-source-button');
     const copyConvertedButton = document.getElementById('copy-converted-button');
 
+    const getSelectedEqRule = () => document.querySelector('input[name="eq-rule"]:checked').value ?? 'abs';
+    const getSelectedLeRule = () => document.querySelector('input[name="le-rule"]:checked').value ?? 'abs';
+
     const copyButtonText = copyConvertedButton.textContent;
     let copyMessageTimeoutId = null;
 
+    const convertCode = (code, eqRule, leRule) => {
+        let converted = code;
+        
+        return converted;
+    };
+
     const updateConvertedCode = () => {
-        convertedCode.value = sourceCode.value;
+        const eqRule = getSelectedEqRule();
+        const leRule = getSelectedLeRule();
+
+        convertedCode.value = convertCode(sourceCode.value, eqRule, leRule);
     };
 
     sourceCode.addEventListener('input', updateConvertedCode);
