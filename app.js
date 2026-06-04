@@ -8,6 +8,9 @@
     const clearSourceButton = document.getElementById('clear-source-button');
     const copyConvertedButton = document.getElementById('copy-converted-button');
 
+    const copyButtonText = copyConvertedButton.textContent;
+    let copyMessageTimeoutId = null;
+
     const updateConvertedCode = () => {
         convertedCode.value = sourceCode.value;
     };
@@ -29,5 +32,23 @@
     clearSourceButton.addEventListener('click', () => {
         sourceCode.value = '';
         updateConvertedCode();
+    });
+
+    copyConvertedButton.addEventListener('click', async () => {
+        if (!convertedCode.value) {
+            return;
+        }
+
+        try {
+            await navigator.clipboard.writeText(convertedCode.value);
+
+            copyConvertedButton.textContent = 'コピーしました';
+            clearTimeout(copyMessageTimeoutId);
+            copyMessageTimeoutId = setTimeout(() => {
+                copyConvertedButton.textContent = copyButtonText;
+            }, 1500);
+        } catch {
+            alert('クリップボードへのコピーに失敗しました。');
+        }
     });
 })();
