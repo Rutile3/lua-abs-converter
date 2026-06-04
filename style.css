@@ -16,7 +16,7 @@ body {
     background: #efefef;
 }
 
-.mono {
+.code-area {
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Roboto Mono",
         "Source Code Pro", "Noto Sans Mono CJK JP", "Noto Sans Mono", monospace;
 }

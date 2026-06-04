@@ -40,19 +40,28 @@
         <div class="row g-4">
             <div class="col-lg-6">
                 <div class="card shadow-sm">
-                    <div class="card-header bg-light fw-semibold">ソースコード（入力）</div>
+                    <div class="card-header bg-light d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <span class="fw-semibold">ソースコード（入力）</span>
+                        <div class="d-flex gap-2">
+                            <button type="button" id="load-sample-button" class="btn btn-sm btn-outline-secondary">サンプル</button>
+                            <button type="button" id="clear-source-button" class="btn btn-sm btn-outline-danger">クリア</button>
+                        </div>
+                    </div>
                     <div class="card-body">
                         <textarea id="source-code" class="form-control code-area" rows="8" placeholder="ここにコードを貼り付け…"
-                    spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+                            spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
                     </div>
                 </div>
             </div>
             <div class="col-lg-6">
                 <div class="card shadow-sm">
-                    <div class="card-header bg-light fw-semibold">ソースコード（出力）</div>
+                    <div class="card-header bg-light d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <span class="fw-semibold">ソースコード（出力）</span>
+                        <button type="button" id="copy-converted-button" class="btn btn-sm btn-primary">コピー</button>
+                    </div>
                     <div class="card-body">
                         <textarea id="converted-code" class="form-control code-area" rows="8" placeholder="変換結果がここに表示されます"
-                    spellcheck="false" autocapitalize="off" autocomplete="off" readonly></textarea>
+                            spellcheck="false" autocapitalize="off" autocomplete="off" readonly></textarea>
                     </div>
                 </div>
             </div>
