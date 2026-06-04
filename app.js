@@ -8,6 +8,12 @@
     const clearSourceButton = document.getElementById('clear-source-button');
     const copyConvertedButton = document.getElementById('copy-converted-button');
 
+    const updateConvertedCode = () => {
+        convertedCode.value = sourceCode.value;
+    };
+
+    sourceCode.addEventListener('input', updateConvertedCode);
+
     loadSampleButton.addEventListener('click', () => {
         sourceCode.value = [
             'if abs(x) <= 3 and y == 1 then',
@@ -17,10 +23,11 @@
             'z = abs(a) <= (A+B)',
             'w = abs(foo) == 3.5',
         ].join('\n');
+        updateConvertedCode();
     });
 
     clearSourceButton.addEventListener('click', () => {
         sourceCode.value = '';
-        convertedCode.value = '';
+        updateConvertedCode();
     });
 })();
