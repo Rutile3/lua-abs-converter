@@ -40,13 +40,19 @@
     const convertCode = (code, eqRule, leRule) => {
         let converted = code;
 
-        const identifier = '[A-Za-z_]\\w*';
-        const number = '-?\\d+(?:\\.\\d+)?';
-        const parenthesizedExpression = '\\([^()\\n]*\\)';
+        // パターン部品
+        const identifier = '[A-Za-z_]\\w*'; // 識別子
+        const number = '-?\\d+(?:\\.\\d+)?'; // 数値（負数、整数、小数を考慮）
+        const parenthesizedExpression = '\\([^()\\n]*\\)'; // 括弧で囲まれた式
+
+        // 左辺と右辺
+        const wordBoundary = '\\b';
+        const absVariable = `${wordBoundary}abs\\(\\s*(${identifier})\\s*\\)`;
         const rightHandSide = `(${number}|${identifier}|${parenthesizedExpression})`;
 
-        const eqPattern = new RegExp(`\\babs\\(\\s*(${identifier})\\s*\\)\\s*==\\s*${rightHandSide}`, 'g');
-        const lePattern = new RegExp(`\\babs\\(\\s*(${identifier})\\s*\\)\\s*<=\\s*${rightHandSide}`, 'g');
+        // abs() を含む左辺と比較対象の右辺
+        const eqPattern = new RegExp(`${absVariable}\\s*==\\s*${rightHandSide}`, 'g');
+        const lePattern = new RegExp(`${absVariable}\\s*<=\\s*${rightHandSide}`, 'g');
 
         converted = converted.replace(eqPattern, (matched, variable, rawValue) => {
             const value = rawValue.trim();
